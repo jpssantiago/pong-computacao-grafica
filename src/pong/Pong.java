@@ -10,8 +10,9 @@ import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.FPSAnimator;
 import pong.scenes.IntroductionScene;
 import keyboard.IntroductionKeyboard;
-import keyboard.Level1Keyboard;
-import pong.scenes.Level1Scene;
+import keyboard.GameKeyboard;
+import mouse.GameMouse;
+import pong.scenes.GameScene;
 import utils.TextUtils;
 
 public class Pong {
@@ -27,8 +28,9 @@ public class Pong {
     private static IntroductionScene introductionScene;
     private static IntroductionKeyboard introductionKeyboard;
     
-    private static Level1Scene level1Scene;
-    private static Level1Keyboard level1Keyboard;
+    private static GameScene gameScene;
+    private static GameKeyboard gameKeyboard;
+    private static GameMouse gameMouse;
     
     public static void main(String[] args) {
         initRender();
@@ -42,15 +44,18 @@ public class Pong {
         window.addKeyListener(introductionKeyboard);
     }
     
-    public static void showLevel1() {
+    public static void showGame() {
         window.removeGLEventListener(introductionScene);
         window.removeKeyListener(introductionKeyboard);
         
-        level1Scene = new Level1Scene();
-        window.addGLEventListener(level1Scene);
+        gameScene = new GameScene(window.getWidth());
+        window.addGLEventListener(gameScene);
         
-        level1Keyboard = new Level1Keyboard(level1Scene);
-        window.addKeyListener(level1Keyboard);
+        gameKeyboard = new GameKeyboard(gameScene);
+        window.addKeyListener(gameKeyboard);
+        
+        gameMouse = new GameMouse(gameScene);
+        window.addMouseListener(gameMouse);
     }
     
     public static void drawBall(GL2 gl, float xPosition, float yPosition) {
@@ -171,5 +176,6 @@ public class Pong {
         });       
                
         window.setVisible(true);
+        window.setPointerVisible(false);
     }
 }

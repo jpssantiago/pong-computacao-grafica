@@ -3,12 +3,12 @@ package keyboard;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
 import pong.Pong;
-import pong.scenes.Level1Scene;
+import pong.scenes.GameScene;
 
-public class Level1Keyboard implements KeyListener {
-    private Level1Scene level1Scene;
+public class GameKeyboard implements KeyListener {
+    private GameScene level1Scene;
     
-    public Level1Keyboard(Level1Scene level1Scene) {
+    public GameKeyboard(GameScene level1Scene) {
         this.level1Scene = level1Scene;
     }
     

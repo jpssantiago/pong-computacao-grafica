@@ -5,10 +5,6 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.glu.GLU;
-import com.jogamp.opengl.util.awt.TextRenderer;
-import java.awt.Font;
-import java.awt.geom.Rectangle2D;
-import pong.Pong;
 import utils.TextUtils;
 
 public class IntroductionScene implements GLEventListener {

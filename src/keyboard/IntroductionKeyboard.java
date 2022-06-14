@@ -14,7 +14,7 @@ public class IntroductionKeyboard implements KeyListener {
                 Pong.exitGame();
                 break;
             case KeyEvent.VK_ENTER:
-                Pong.showLevel1();
+                Pong.showGame();
                 break;
             default:
                 break;

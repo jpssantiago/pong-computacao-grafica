@@ -8,20 +8,23 @@ import pong.Pong;
 import utils.TextUtils;
 
 // TODO: Trocar Level1Scene para GameScene e controlar tudo somente pelo Pong.level
-public class Level1Scene implements GLEventListener {
-    private float xMin, xMax, yMin, yMax, zMin, zMax;
+public class GameScene implements GLEventListener {
+    private float xMin, xMax, yMin, yMax;
     private GLU glu;
     
-    private float barX1 = -0.2f;
-    private float barX2 = 0.2f;
-    private float barIncrement = 0.02f;
+    private float barX1;
+    private float barX2;
+    private float barIncrement = 0.05f;
     
     private float ballXPosition = 0;
     private float ballYPosition;
     private float ballYIncrement = -0.01f;
     private float ballXIncrement;
     
-    public Level1Scene() {
+    private int maxWidth;
+    
+    public GameScene(int maxWidth) {
+        this.maxWidth = maxWidth;
         startLevel();
     }
     
@@ -29,8 +32,8 @@ public class Level1Scene implements GLEventListener {
         ballXIncrement = 0.004f;
         ballYPosition = 0.9f;
         
-        barX1 = -0.2f;
-        barX2 = 0.2f;
+        barX1 = -0.15f;
+        barX2 = 0.15f;
         
         if (Math.random() < 0.5) {
             ballXIncrement *= -1;
@@ -76,16 +79,37 @@ public class Level1Scene implements GLEventListener {
     
     // TODO: Mover bastão com MOUSE também.
     public void moveLeft() {
-        if (barX1 - barIncrement > xMin && !Pong.paused) {
+        if (barX1 - barIncrement > xMin - 0.05f && !Pong.paused) {
+            System.out.println(barX1 - barIncrement);
+            System.out.println(xMin);
             barX1 -= barIncrement;
             barX2 -= barIncrement;
         }
     }
     
     public void moveRight() {
-        if (barX2 + barIncrement < xMax && !Pong.paused) {
+        if (barX2 + barIncrement < xMax + 0.05f && !Pong.paused) {
             barX1 += barIncrement;
             barX2 += barIncrement;
+        }
+    }
+    
+    public void moveBarWithMouse(int x) {
+        float oldRange = (maxWidth - 0);  // Get width of window.
+        float newRange = (xMax - xMin);
+        float newValue = (((x - xMin) * newRange) / oldRange) + xMin;
+        
+        barX1 = newValue - 0.15f;
+        barX2 = newValue + 0.15f;
+        
+        if (barX1 < xMin) {
+            barX1 = xMin;
+            barX2 = xMin + 0.3f;
+        }
+        
+        if (barX2 > xMax) {
+            barX1 = xMax - 0.3f;
+            barX2 = xMax + 0.3f;
         }
     }
    
@@ -93,8 +117,8 @@ public class Level1Scene implements GLEventListener {
     public void init(GLAutoDrawable drawable) {
         glu = new GLU();
         
-        xMin = yMin = zMin = -1;
-        xMax = yMax = zMax = 1;
+        xMin = yMin = -1;
+        xMax = yMax = 1;
     }
     
     @Override
