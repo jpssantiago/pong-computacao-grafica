@@ -18,7 +18,7 @@ public class GameScene implements GLEventListener {
     
     private float ballXPosition = 0;
     private float ballYPosition;
-    private float ballYIncrement = -0.01f;
+    private float ballYIncrement;
     private float ballXIncrement;
     
     private int maxWidth;
@@ -28,8 +28,15 @@ public class GameScene implements GLEventListener {
         startLevel();
     }
     
-    private void startLevel() {        
-        ballXIncrement = 0.004f;
+    private void startLevel() {
+        if (Pong.level == 1) {
+            ballXIncrement = 0.006f;
+            ballYIncrement = -0.011f;
+        } else {
+            ballXIncrement = 0.012f;
+            ballYIncrement = 0.03f;
+        }
+        
         ballYPosition = 0.9f;
         
         barX1 = -0.15f;
@@ -80,8 +87,6 @@ public class GameScene implements GLEventListener {
     // TODO: Mover bastão com MOUSE também.
     public void moveLeft() {
         if (barX1 - barIncrement > xMin - 0.05f && !Pong.paused) {
-            System.out.println(barX1 - barIncrement);
-            System.out.println(xMin);
             barX1 -= barIncrement;
             barX2 -= barIncrement;
         }
@@ -95,6 +100,8 @@ public class GameScene implements GLEventListener {
     }
     
     public void moveBarWithMouse(int x) {
+        if (Pong.paused) return;
+        
         float oldRange = (maxWidth - 0);  // Get width of window.
         float newRange = (xMax - xMin);
         float newValue = (((x - xMin) * newRange) / oldRange) + xMin;
@@ -112,6 +119,19 @@ public class GameScene implements GLEventListener {
             barX2 = xMax + 0.3f;
         }
     }
+    
+    private void drawLevel2Object(GL2 gl) {
+        // TODO: Escolher objeto ainda.
+        gl.glPushMatrix();
+        gl.glColor3f(0, 0, 0);
+        gl.glBegin(GL2.GL_QUADS);
+            gl.glVertex2f(-0.2f, -0.1f);
+            gl.glVertex2f(-0.2f, 0.1f);
+            gl.glVertex2f(0.2f, 0.1f);
+            gl.glVertex2f(0.2f, -0.1f);
+        gl.glEnd();
+        gl.glPopMatrix();
+    }
    
     @Override
     public void init(GLAutoDrawable drawable) {
@@ -128,9 +148,10 @@ public class GameScene implements GLEventListener {
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
         gl.glLoadIdentity();
         
-        if (Pong.points == 200) {
-            Pong.paused = true;
+        if (Pong.level == 1 && Pong.points == 200) {
             Pong.level = 2;
+            ballYIncrement = 0.03f;
+            ballXIncrement = 0.012f;
         }
         
         Pong.drawBall(gl, ballXPosition, ballYPosition);
@@ -148,6 +169,10 @@ public class GameScene implements GLEventListener {
             int height = drawable.getSurfaceHeight();
             
             TextUtils.drawText(drawable, "Você perdeu! Para recomeçar, pressione ESPAÇO.", 30, width / 2, height / 2);
+        }
+        
+        if (Pong.level == 2) {
+            drawLevel2Object(gl);
         }
         
         gl.glFlush();

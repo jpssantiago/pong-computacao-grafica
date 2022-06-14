@@ -20,7 +20,7 @@ public class Pong {
     
     public static int level = 1;
     public static int points = 0;
-    public static int pointsIncrement = 25;
+    public static int pointsIncrement = 200;
     public static int lives = 5;
     public static boolean paused = true;
     public static boolean gameOver = false;
