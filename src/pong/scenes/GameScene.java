@@ -3,14 +3,12 @@ package pong.scenes;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
-import com.jogamp.opengl.glu.GLU;
+import java.util.Random;
 import pong.Pong;
 import utils.TextUtils;
 
-// TODO: Trocar Level1Scene para GameScene e controlar tudo somente pelo Pong.level
 public class GameScene implements GLEventListener {
     private float xMin, xMax, yMin, yMax;
-    private GLU glu;
     
     private float barX1;
     private float barX2;
@@ -30,10 +28,10 @@ public class GameScene implements GLEventListener {
     
     private void startLevel() {
         if (Pong.level == 1) {
-            ballXIncrement = 0.006f;
-            ballYIncrement = -0.011f;
+            ballXIncrement = 0.008f;
+            ballYIncrement = -0.012f;
         } else {
-            ballXIncrement = 0.012f;
+            ballXIncrement = 0.014f;
             ballYIncrement = 0.03f;
         }
         
@@ -53,6 +51,7 @@ public class GameScene implements GLEventListener {
             ballYPosition += ballYIncrement;
             ballXPosition += ballXIncrement;
             
+            // Colisão com as laterais
             if (ballYPosition >= yMax - 0.08f) {
                 ballYIncrement *= -1;
             }
@@ -65,10 +64,40 @@ public class GameScene implements GLEventListener {
                 ballXIncrement *= -1;
             }
             
+            // Colisão com o objeto da 2 fase.
+            if (Pong.level == 2) {
+                if (ballXPosition >= -0.2f && ballXPosition <= 0.2f) {
+                    if (ballYPosition >= -0.21 && ballYPosition <= -0.19f) {
+                        ballYIncrement *= -1;
+                    }
+                }
+                
+                if (ballYPosition >= 0 && ballYPosition <= 0.2f) {
+                    if (ballXPosition >= 0 && ballXPosition <= 0.1f) {
+                        ballXIncrement *= -1;
+                        ballYIncrement *= -1;
+                    } else if (ballXPosition >= -0.1f && ballXPosition <= 0) {
+                        ballXIncrement *= -1;
+                        ballYIncrement *= -1;
+                    }
+                } else if (ballYPosition >= -0.2f && ballYPosition <= 0) {
+                    if (ballXPosition >= 0 && ballXPosition <= 0.2f) {
+                        ballXIncrement *= -1;
+                    } else if (ballXPosition >= -0.2f && ballXPosition <= 0) {
+                        ballXIncrement *= -1;
+                    }
+                }
+            }
+            
             if (ballYPosition <= yMin + 0.08f) {
                 if (ballXPosition >= barX1 && ballXPosition <= barX2) {
                     ballYIncrement *= -1;
                     Pong.points += Pong.pointsIncrement;
+                    
+                    boolean invert = new Random().nextBoolean();
+                    if (invert) {
+                        ballXIncrement *= -1;
+                    }
                 } else {
                     startLevel();
                     Pong.lives--;
@@ -121,22 +150,18 @@ public class GameScene implements GLEventListener {
     }
     
     private void drawLevel2Object(GL2 gl) {
-        // TODO: Escolher objeto ainda.
         gl.glPushMatrix();
-        gl.glColor3f(0, 0, 0);
-        gl.glBegin(GL2.GL_QUADS);
-            gl.glVertex2f(-0.2f, -0.1f);
-            gl.glVertex2f(-0.2f, 0.1f);
-            gl.glVertex2f(0.2f, 0.1f);
-            gl.glVertex2f(0.2f, -0.1f);
+        gl.glColor3f(0.2f, 0.2f, 0.2f);
+        gl.glBegin(GL2.GL_TRIANGLES);
+            gl.glVertex2f(-0.2f, -0.2f);
+            gl.glVertex2f(0.2f, -0.2f);
+            gl.glVertex2f(0, 0.2f);
         gl.glEnd();
         gl.glPopMatrix();
     }
    
     @Override
-    public void init(GLAutoDrawable drawable) {
-        glu = new GLU();
-        
+    public void init(GLAutoDrawable drawable) {       
         xMin = yMin = -1;
         xMax = yMax = 1;
     }
@@ -150,8 +175,8 @@ public class GameScene implements GLEventListener {
         
         if (Pong.level == 1 && Pong.points == 200) {
             Pong.level = 2;
-            ballYIncrement = 0.03f;
             ballXIncrement = 0.012f;
+            ballYIncrement = 0.02f;
         }
         
         Pong.drawBall(gl, ballXPosition, ballYPosition);
