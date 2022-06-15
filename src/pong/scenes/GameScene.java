@@ -5,6 +5,7 @@ import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import java.util.Random;
 import pong.Pong;
+import resources.Textura;
 import utils.TextUtils;
 
 public class GameScene implements GLEventListener {
@@ -21,6 +22,8 @@ public class GameScene implements GLEventListener {
     
     private int maxWidth;
     
+    private static Textura texture;
+    
     public GameScene(int maxWidth) {
         this.maxWidth = maxWidth;
         startLevel();
@@ -28,8 +31,8 @@ public class GameScene implements GLEventListener {
     
     private void startLevel() {
         if (Pong.level == 1) {
-            ballXIncrement = 0.008f;
-            ballYIncrement = -0.012f;
+            ballXIncrement = 0.01f;
+            ballYIncrement = -0.015f;
         } else {
             ballXIncrement = 0.014f;
             ballYIncrement = 0.03f;
@@ -94,8 +97,8 @@ public class GameScene implements GLEventListener {
                     ballYIncrement *= -1;
                     Pong.points += Pong.pointsIncrement;
                     
-                    boolean invert = new Random().nextBoolean();
-                    if (invert) {
+                    float random = new Random().nextFloat();
+                    if (random <= 0.3) {
                         ballXIncrement *= -1;
                     }
                 } else {
@@ -107,6 +110,7 @@ public class GameScene implements GLEventListener {
                         ballXPosition = 0f;
                         Pong.paused = true;
                         Pong.gameOver = true;
+                        Pong.level = 1;
                     }
                 }
             }
@@ -164,6 +168,8 @@ public class GameScene implements GLEventListener {
     public void init(GLAutoDrawable drawable) {       
         xMin = yMin = -1;
         xMax = yMax = 1;
+        
+        texture = new Textura(1);
     }
     
     @Override
@@ -172,6 +178,11 @@ public class GameScene implements GLEventListener {
         gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         gl.glClear(GL2.GL_COLOR_BUFFER_BIT);
         gl.glLoadIdentity();
+        
+        texture.setAutomatica(false);
+        texture.setFiltro(GL2.GL_LINEAR);
+        texture.setModo(GL2.GL_REPEAT);
+        texture.setWrap(GL2.GL_DECAL);
         
         if (Pong.level == 1 && Pong.points == 200) {
             Pong.level = 2;
@@ -182,7 +193,7 @@ public class GameScene implements GLEventListener {
         Pong.drawBall(gl, ballXPosition, ballYPosition);
         Pong.drawBar(gl, barX1, barX2);
         Pong.drawPointsIndicator(drawable);
-        Pong.drawLivesIndicator(gl);
+        Pong.drawLivesIndicator(gl, texture);
         Pong.drawPausedIndicator(drawable);
                 
         if (!Pong.paused) {
