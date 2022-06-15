@@ -5,6 +5,9 @@ import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import java.util.Random;
 import pong.Pong;
+import static pong.Pong.level;
+import static pong.Pong.lives;
+import static pong.Pong.points;
 import resources.Textura;
 import utils.TextUtils;
 
@@ -111,6 +114,7 @@ public class GameScene implements GLEventListener {
                         Pong.paused = true;
                         Pong.gameOver = true;
                         Pong.level = 1;
+                        Pong.points = 0;
                     }
                 }
             }
@@ -153,6 +157,90 @@ public class GameScene implements GLEventListener {
         }
     }
     
+    public void drawBall(GL2 gl, float xPosition, float yPosition) {       
+        int vertices = 50;
+        double radius = 0.5;
+        double angle = 0;
+        double angleIncrement = 2 * Math.PI / vertices;
+        
+        gl.glPushMatrix();
+        gl.glTranslatef(xPosition, yPosition, 0);
+        gl.glScalef(0.08f, 0.13f, 0.08f);
+        gl.glColor3f(1, 1, 1);
+        gl.glBegin(GL2.GL_POLYGON);
+            for (int z = 0; z < vertices; z++) {
+                angle = z * angleIncrement;
+                double x = radius * Math.cos(angle);
+                double y = radius * Math.sin(angle);
+                gl.glVertex2d(x, y);
+            }
+        gl.glEnd();
+        gl.glPopMatrix();
+    }
+    
+    public void drawBar(GL2 gl, float x1, float x2) {
+        gl.glPushMatrix();
+        gl.glColor3f(1, 1, 1);
+        gl.glBegin(GL2.GL_QUADS);
+            gl.glVertex2f(x1, -1f);
+            gl.glVertex2f(x1, -0.97f);
+            gl.glVertex2f(x2, -0.97f);
+            gl.glVertex2f(x2, -1f);
+        gl.glEnd();
+        gl.glPopMatrix();
+    }
+    
+    public void drawPointsIndicator(GLAutoDrawable drawable) {
+        int height = drawable.getSurfaceHeight();
+            
+        TextUtils.drawText(drawable, level + "ª Fase - " + points + " pontos", 20, 10, height - 30, false);
+    }
+    
+    public void drawLivesIndicator(GL2 gl, Textura texture) {
+        float xPosition = -0.965f;
+        float yPosition = 0.85f;
+        
+        for (int i = 0; i < lives; i++) {
+            drawLifeObject(gl, xPosition, yPosition, texture);
+            
+            xPosition += 0.08f;
+        }
+    }
+    
+    public void drawLifeObject(GL2 gl, float xPosition, float yPosition, Textura texture) {
+        texture.gerarTextura(gl, "resources/heart.png", 0);
+        
+        gl.glPushMatrix();
+        gl.glTranslatef(xPosition, yPosition, 0);
+        gl.glScalef(0.05f, 0.09f, 0.05f);
+        gl.glColor3f(1, 1, 1);
+        gl.glBegin(GL2.GL_QUADS);
+            gl.glTexCoord2f(1, 0);
+            gl.glVertex2f(-0.5f, -0.5f);
+            
+            gl.glTexCoord2f(1, 1);
+            gl.glVertex2f(-0.5f, 0.5f);
+            
+            gl.glTexCoord2f(0, 1);
+            gl.glVertex2f(0.5f, 0.5f);
+            
+            gl.glTexCoord2f(0, 0);
+            gl.glVertex2f(0.5f, -0.5f);
+        gl.glEnd();
+        gl.glPopMatrix();
+        
+        texture.desabilitarTextura(gl, 0);
+    }
+    
+    public void drawPausedIndicator(GLAutoDrawable drawable) {
+        if (Pong.paused) {
+            int width = drawable.getSurfaceWidth();
+            int height = drawable.getSurfaceHeight();
+            
+            TextUtils.drawText(drawable, "Pausado", 20, width - 95, height - 30, false);
+        }
+    }
+    
     private void drawLevel2Object(GL2 gl) {
         gl.glPushMatrix();
         gl.glColor3f(0.2f, 0.2f, 0.2f);
@@ -169,7 +257,7 @@ public class GameScene implements GLEventListener {
         xMin = yMin = -1;
         xMax = yMax = 1;
         
-        texture = new Textura(1);
+        texture = new Textura(2);
     }
     
     @Override
@@ -186,15 +274,15 @@ public class GameScene implements GLEventListener {
         
         if (Pong.level == 1 && Pong.points == 200) {
             Pong.level = 2;
-            ballXIncrement = 0.012f;
-            ballYIncrement = 0.02f;
+            ballXIncrement = 0.014f;
+            ballYIncrement = 0.03f;
         }
         
-        Pong.drawBall(gl, ballXPosition, ballYPosition);
-        Pong.drawBar(gl, barX1, barX2);
-        Pong.drawPointsIndicator(drawable);
-        Pong.drawLivesIndicator(gl, texture);
-        Pong.drawPausedIndicator(drawable);
+        drawBall(gl, ballXPosition, ballYPosition);
+        drawBar(gl, barX1, barX2);
+        drawPointsIndicator(drawable);
+        drawLivesIndicator(gl, texture);
+        drawPausedIndicator(drawable);
                 
         if (!Pong.paused) {
             moveBall();
